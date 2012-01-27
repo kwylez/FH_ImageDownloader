@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from epblib.utils.decorators import async
+from lib.utils.decorators import async
 
 
 # Fetch Paths to Images
