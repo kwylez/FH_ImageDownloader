@@ -35,6 +35,7 @@ def fetch_image_paths(url):
 
 
 def find_latest_posts():
+
     http = httplib2.Http()
     status, response = http.request(FRESH_HOMES_ROOT_URL)
     soup = BeautifulSoup(response, parseOnlyThese=SoupStrainer('h1'))
@@ -51,7 +52,6 @@ if __name__ == "__main__":
 
     for link in find_latest_posts():
         try:
-
             print link['href']
             print "Fetching image for %s\n" % link['href']
 
@@ -64,6 +64,6 @@ if __name__ == "__main__":
                 t.start()
 
                 queue.put(image_link['src'])
-                queue.join()
         except KeyError:
             pass
+queue.join()
