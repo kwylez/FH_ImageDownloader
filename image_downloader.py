@@ -2,12 +2,16 @@
 
 import httplib2
 import urllib
+import Queue
 
 from BeautifulSoup import BeautifulSoup, SoupStrainer
+
+from lib.utils.imagethreading import ThreadUrl
 # from lib.utils.decorators import async
 
 FRESH_HOMES_ROOT_URL = 'http://freshome.com/'
 DEBUG = False
+queue = Queue.Queue()
 
 
 # Fetch Paths to Images
@@ -30,13 +34,6 @@ def fetch_image_paths(url):
     return all_image_links
 
 
-def download_image_for_url(url):
-    if DEBUG:
-        print "image to download %s\n" % url
-    image_file_name = url.split('/')[-1]
-    urllib.urlretrieve(url, image_file_name)
-
-
 def find_latest_posts():
     http = httplib2.Http()
     status, response = http.request(FRESH_HOMES_ROOT_URL)
@@ -54,10 +51,19 @@ if __name__ == "__main__":
 
     for link in find_latest_posts():
         try:
+
             print link['href']
             print "Fetching image for %s\n" % link['href']
+
             for image_link in fetch_image_paths(link['href']):
+
                 print "Source link: %s" % image_link['src']
-                download_image_for_url(image_link['src'])
+
+                t = ThreadUrl(queue)
+                t.setDaemon(True)
+                t.start()
+
+                queue.put(image_link['src'])
+                queue.join()
         except KeyError:
             pass
