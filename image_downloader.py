@@ -42,10 +42,14 @@ def find_latest_posts():
 
     http = httplib2.Http()
     status, response = http.request(FRESH_HOMES_ROOT_URL)
-    soup = BeautifulSoup(response, parseOnlyThese=SoupStrainer('h1'))
 
-    # Find all the 'a' tags skipping the first which is the homepage
-    all_links = soup.findAll({'a': True})[1:]
+    print "Status %s" % status
+
+    if (status.status == 200):
+        soup = BeautifulSoup(response, parseOnlyThese=SoupStrainer('h1'))
+
+        # Find all the 'a' tags skipping the first which is the homepage
+        all_links = soup.findAll({'a': True})[1:]
 
     return all_links
 
