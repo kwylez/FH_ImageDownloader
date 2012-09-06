@@ -2,6 +2,8 @@
 
 import httplib2
 import urllib
+import errno
+import os
 from threading import Thread
 
 from BeautifulSoup import BeautifulSoup, SoupStrainer
@@ -11,6 +13,13 @@ from BeautifulSoup import BeautifulSoup, SoupStrainer
 
 FRESH_HOMES_ROOT_URL = 'http://freshome.com/'
 DEBUG = False
+
+def make_require_dir(path):
+    try:
+        os.makedirs(path)
+    except OSError, exc:
+        if exc.errno != errno.EEXIST:
+            raise
 
 
 # Fetch Paths to Images
@@ -34,8 +43,16 @@ def fetch_image_paths(url):
 
 
 def download_image_for_url(url):
+
+    directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fh-images")
+    make_require_dir(directory)
+
+    # grab the image name from url
     image_file_name = url.split('/')[-1]
-    urllib.urlretrieve(url, image_file_name)
+    filename = os.path.join(directory, image_file_name)
+
+    if not os.path.exists(filename):
+        urllib.urlretrieve(url, filename)
 
 
 def find_latest_posts():
@@ -43,7 +60,8 @@ def find_latest_posts():
     http = httplib2.Http()
     status, response = http.request(FRESH_HOMES_ROOT_URL)
 
-    print "Status %s" % status
+    if DEBUG:
+        print "Status %s" % status
 
     if (status.status == 200):
         soup = BeautifulSoup(response, parseOnlyThese=SoupStrainer('h1'))
@@ -60,12 +78,13 @@ if __name__ == "__main__":
 
     for link in find_latest_posts():
         try:
-            print link['href']
+            if DEBUG:
+                print link['href']
             print "Fetching image for %s\n" % link['href']
 
             for image_link in fetch_image_paths(link['href']):
-
-                print "Source link: %s" % image_link['src']
+                if DEBUG:
+                    print "Source link: %s" % image_link['src']
 
                 t = Thread(target=download_image_for_url, args=(image_link['src'],))
                 t.start()
