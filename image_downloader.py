@@ -47,6 +47,10 @@ def download_image_for_url(url):
     directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fh-images")
     make_require_dir(directory)
 
+    # url encode for special characters or it will fail
+    url = unicode(url)
+    url = url.encode('utf-8')
+
     # grab the image name from url
     image_file_name = url.split('/')[-1]
     filename = os.path.join(directory, image_file_name)
