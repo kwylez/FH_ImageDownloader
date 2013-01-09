@@ -4,15 +4,14 @@ import httplib2
 import urllib
 import errno
 import os
+import datetime
+
 from threading import Thread
-
 from BeautifulSoup import BeautifulSoup, SoupStrainer
-
-# from lib.utils.imagethreading import ThreadUrl
-# from lib.utils.decorators import async
 
 FRESH_HOMES_ROOT_URL = 'http://freshome.com/'
 DEBUG = False
+
 
 def make_require_dir(path):
     try:
@@ -44,7 +43,9 @@ def fetch_image_paths(url):
 
 def download_image_for_url(url):
 
-    directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fh-images")
+    now = datetime.datetime.now()
+    # Create directory for today's date
+    directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fh-images-%d-%d-%d" % (now.year, now.month, now.day))
     make_require_dir(directory)
 
     # url encode for special characters or it will fail
