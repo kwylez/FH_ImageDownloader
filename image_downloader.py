@@ -7,7 +7,7 @@ import os
 import datetime
 
 from threading import Thread
-from BeautifulSoup import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup, SoupStrainer
 
 FRESH_HOMES_ROOT_URL = 'http://freshome.com/'
 DEBUG = False
